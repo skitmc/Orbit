@@ -1,0 +1,855 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080817">
+<title>Orbit — Explore Beyond</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #080817;
+    --panel: rgba(20, 20, 43, .85);
+    --border: rgba(160, 145, 255, .17);
+    --purple: #a78bfa;
+    --text: #fff;
+    --muted: #aaa9c7;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", sans-serif;
+    background: var(--bg);
+    overflow-x: hidden;
+}
+
+/* GALAXY BACKGROUND */
+
+.space {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background:
+      radial-gradient(ellipse at 15% 25%,
+        rgba(91, 55, 180, .32), transparent 40%),
+      radial-gradient(ellipse at 85% 65%,
+        rgba(32, 80, 160, .23), transparent 45%),
+      radial-gradient(ellipse at 50% 100%,
+        rgba(105, 40, 160, .18), transparent 50%),
+      #080817;
+}
+
+.stars {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, white 99%, transparent),
+      radial-gradient(1px 1px at 30% 70%, white 99%, transparent),
+      radial-gradient(2px 2px at 75% 15%, white 99%, transparent),
+      radial-gradient(1px 1px at 90% 80%, white 99%, transparent),
+      radial-gradient(1px 1px at 55% 40%, white 99%, transparent),
+      radial-gradient(2px 2px at 20% 90%, white 99%, transparent),
+      radial-gradient(1px 1px at 65% 85%, white 99%, transparent),
+      radial-gradient(1px 1px at 45% 10%, white 99%, transparent);
+    background-size: 300px 300px;
+    opacity: .65;
+}
+
+/* HEADER */
+
+header {
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8, 8, 23, .7);
+    backdrop-filter: blur(15px);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.brand-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #7651df, #34246d);
+    box-shadow: 0 0 20px #7952df55;
+    font-size: 20px;
+}
+
+.header-right {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.account-button {
+    min-height: 38px;
+    padding: 0 15px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 999px;
+    background: white;
+    color: #242424;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+.account-button:hover {
+    background: #eee;
+}
+
+.account-button:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+    outline: 2px solid #c4b5fd;
+    outline-offset: 3px;
+}
+
+.account-email {
+    max-width: 180px;
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* MAIN */
+
+main {
+    width: 100%;
+    max-width: 850px;
+    margin: auto;
+    padding: 65px 20px 40px;
+}
+
+.hero {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.orbit-logo {
+    font-size: 43px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 15px #a78bfa);
+}
+
+.hero h1 {
+    font-size: clamp(32px, 8vw, 52px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    background: linear-gradient(90deg, #fff, #c4b5fd, #8ba9ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.hero p {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* SEARCH */
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 650px;
+    height: 59px;
+    margin: auto;
+    padding: 0 18px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: rgba(20, 20, 43, .9);
+    box-shadow: 0 10px 45px rgba(0,0,0,.25);
+    transition: .25s;
+}
+
+.search-box:focus-within {
+    border-color: var(--purple);
+    box-shadow: 0 0 25px #a78bfa25;
+}
+
+.search-box span {
+    font-size: 19px;
+    color: var(--purple);
+}
+
+.search-box input {
+    flex: 1;
+    width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-size: 15px;
+}
+
+.search-box input::placeholder {
+    color: #85849e;
+}
+
+.search-box button {
+    border: none;
+    background: transparent;
+    color: var(--purple);
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* SECTION HEADERS */
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 48px 0 18px;
+}
+
+.section-heading h2 {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.section-heading span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* BOOKMARKS */
+
+.bookmarks {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 13px;
+}
+
+.bookmark {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    min-height: 110px;
+    padding: 13px 5px;
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    background: var(--panel);
+    color: white;
+    text-decoration: none;
+    transition: .2s;
+    cursor: pointer;
+}
+
+.bookmark:hover {
+    transform: translateY(-4px);
+    border-color: #a78bfa88;
+    background: rgba(45, 37, 80, .8);
+}
+
+.bookmark-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(167,139,250,.13);
+    font-size: 21px;
+}
+
+.bookmark-name {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.remove {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    color: #aaa;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+}
+
+.bookmark.custom:hover .remove {
+    display: block;
+}
+
+/* ADD BOOKMARK */
+
+.add-bookmark {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    border: 1px dashed #7770a7;
+    border-radius: 14px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.add-bookmark:hover {
+    color: white;
+    border-color: var(--purple);
+}
+
+/* INFO */
+
+.info {
+    margin-top: 45px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(20,20,43,.55);
+}
+
+.info h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.info p {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+/* FOOTER */
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #77758f;
+    font-size: 11px;
+}
+
+/* DIALOG */
+
+dialog {
+    margin: auto;
+    width: calc(100% - 35px);
+    max-width: 380px;
+    padding: 23px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: #14142a;
+    color: white;
+}
+
+dialog::backdrop {
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(5px);
+}
+
+dialog h2 {
+    font-size: 19px;
+    margin-bottom: 18px;
+}
+
+dialog p {
+    margin: -5px 0 18px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+dialog input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    outline: none;
+    background: #09091a;
+    color: white;
+    font-size: 14px;
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 7px;
+}
+
+.dialog-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #7755d5;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.dialog-buttons .cancel {
+    background: #29283d;
+}
+
+#googleButton {
+    display: flex;
+    justify-content: center;
+    min-height: 44px;
+    margin: 18px 0 12px;
+}
+
+.login-status {
+    min-height: 20px;
+    color: #f0c4c4;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+@media (max-width: 380px) {
+    .bookmarks {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    main {
+        padding-top: 48px;
+    }
+}
+
+@media (max-width: 520px) {
+    header {
+        padding: 0 14px;
+    }
+
+    .header-right {
+        display: none;
+    }
+
+    .account-email {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="space"></div>
+<div class="stars"></div>
+
+<header>
+    <div class="brand">
+        <div class="brand-icon">◉</div>
+        ORBIT
+    </div>
+    <div class="header-actions">
+        <div class="header-right">YOUR PERSONAL WEB</div>
+        <span class="account-email" id="accountEmail" hidden></span>
+        <button class="account-button" id="accountButton" type="button">
+            Continue with Google
+        </button>
+    </div>
+</header>
+
+<main>
+
+    <section class="hero">
+        <div class="orbit-logo">✦</div>
+        <h1>Explore beyond.</h1>
+        <p>Your internet, all in one place.</p>
+    </section>
+
+    <form class="search-box" id="searchForm">
+        <span>⌕</span>
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search Google or enter a URL..."
+            autocomplete="off"
+            required
+        >
+        <button type="submit" aria-label="Search">➜</button>
+    </form>
+
+    <section>
+        <div class="section-heading">
+            <h2>Quick Access</h2>
+            <span>Your favorite websites</span>
+        </div>
+
+        <div class="bookmarks" id="bookmarks"></div>
+
+        <button class="add-bookmark" id="addBookmark">
+            ＋ Add bookmark
+        </button>
+    </section>
+
+    <section class="info">
+        <h3>✦ Welcome to Orbit</h3>
+        <p>
+            Search the web using Google, visit your favorite
+            websites and keep your shortcuts in one place.
+            Your custom bookmarks are saved on this device.
+        </p>
+    </section>
+
+</main>
+
+<footer>
+    ORBIT © 2026 · EXPLORE BEYOND
+</footer>
+
+<dialog id="bookmarkDialog">
+    <h2>Add a bookmark</h2>
+    <form id="bookmarkForm">
+        <input id="bookmarkName"
+            placeholder="Website name" required>
+        <input id="bookmarkUrl"
+            placeholder="Website URL (example.com)" required>
+        <div class="dialog-buttons">
+            <button type="button" class="cancel"
+                id="closeDialog">Cancel</button>
+            <button type="submit">Save</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="loginDialog" aria-labelledby="loginTitle">
+    <h2 id="loginTitle">Sign in to Orbit</h2>
+    <p id="loginDescription">
+        Use your Google account to personalize this browser session.
+        Your bookmarks stay on this device. This page does not protect
+        private data or sync bookmarks between devices.
+    </p>
+    <div id="googleButton"></div>
+    <div class="login-status" id="loginStatus" role="status" aria-live="polite"></div>
+    <div class="dialog-buttons">
+        <button type="button" class="cancel" id="closeLoginDialog">Close</button>
+    </div>
+</dialog>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const defaults = [
+    {name:"Google", icon:"🔍", url:"https://www.google.com"},
+    {name:"TikTok", icon:"♪", url:"https://www.tiktok.com/"},
+    {name:"YouTube", icon:"▶", url:"https://www.youtube.com"},
+    {name:"Discord", icon:"💬", url:"https://discord.com/app"},
+    {name:"Reddit", icon:"👾", url:"https://www.reddit.com"},
+    {name:"Twitch", icon:"📺", url:"https://www.twitch.tv"},
+    {name:"Instagram", icon:"📷", url:"https://www.instagram.com"},
+    {name:"GitHub", icon:"⌘", url:"https://github.com"}
+];
+
+const STORAGE_KEY = "orbit-custom-bookmarks";
+// Set this to a Google OAuth Web client ID configured for this site's origin.
+const GOOGLE_CLIENT_ID = "";
+
+const container = document.getElementById("bookmarks");
+const dialog = document.getElementById("bookmarkDialog");
+const loginDialog = document.getElementById("loginDialog");
+const loginStatus = document.getElementById("loginStatus");
+const accountButton = document.getElementById("accountButton");
+const accountEmail = document.getElementById("accountEmail");
+let googleSignInInitialized = false;
+let signedInProfile = null;
+
+function showLoginStatus(message) {
+    loginStatus.textContent = message;
+}
+
+function decodeGoogleProfile(credential) {
+    const payloadPart = credential.split(".")[1];
+    if (!payloadPart) {
+        throw new Error("Google returned an invalid sign-in response.");
+    }
+
+    const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
+    const bytes = Uint8Array.from(atob(base64), character =>
+        character.charCodeAt(0)
+    );
+    const profile = JSON.parse(new TextDecoder().decode(bytes));
+
+    if (typeof profile.email !== "string" || !profile.email) {
+        throw new Error("Google did not provide an email address.");
+    }
+
+    return {
+        email: profile.email
+    };
+}
+
+function updateAccount(profile) {
+    signedInProfile = profile;
+    accountEmail.textContent = profile ? profile.email : "";
+    accountEmail.hidden = !profile;
+    accountButton.textContent = profile ? "Sign out" : "Continue with Google";
+    accountButton.setAttribute(
+        "aria-label",
+        profile ? "Sign out of Orbit" : "Continue with Google"
+    );
+}
+
+function handleGoogleCredential(response) {
+    try {
+        const profile = decodeGoogleProfile(response.credential);
+        updateAccount(profile);
+        loginDialog.close();
+        showLoginStatus("");
+    } catch (error) {
+        showLoginStatus(error.message);
+    }
+}
+
+function openGoogleSignIn() {
+    showLoginStatus("");
+    document.getElementById("googleButton").replaceChildren();
+
+    if (!GOOGLE_CLIENT_ID) {
+        showLoginStatus(
+            "Google sign-in is not configured. Set GOOGLE_CLIENT_ID in the page script and authorize this site's origin in Google Cloud Console."
+        );
+        loginDialog.showModal();
+        return;
+    }
+
+    if (!window.google?.accounts?.id) {
+        showLoginStatus(
+            "Google sign-in could not load. Check your connection and try again."
+        );
+        loginDialog.showModal();
+        return;
+    }
+
+    try {
+        if (!googleSignInInitialized) {
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleCredential,
+                auto_select: false
+            });
+            googleSignInInitialized = true;
+        }
+
+        window.google.accounts.id.renderButton(
+            document.getElementById("googleButton"),
+            {
+                theme: "filled_black",
+                size: "large",
+                shape: "pill",
+                text: "continue_with",
+                width: Math.max(200, Math.min(350, window.innerWidth - 80))
+            }
+        );
+        loginDialog.showModal();
+    } catch (error) {
+        showLoginStatus(
+            "Google sign-in could not start. Check the client ID and authorized site origin."
+        );
+        loginDialog.showModal();
+    }
+}
+
+accountButton.addEventListener("click", () => {
+    if (signedInProfile) {
+        updateAccount(null);
+        window.google?.accounts?.id?.disableAutoSelect();
+        return;
+    }
+
+    openGoogleSignIn();
+});
+
+document.getElementById("closeLoginDialog")
+    .addEventListener("click", () => loginDialog.close());
+
+function getCustomBookmarks() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveCustomBookmarks(bookmarks) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+}
+
+function renderBookmarks() {
+    container.innerHTML = "";
+
+    const all = [
+        ...defaults.map(item => ({...item, custom:false})),
+        ...getCustomBookmarks().map(item => ({...item, custom:true}))
+    ];
+
+    all.forEach((item, index) => {
+        const link = document.createElement("a");
+        link.className = "bookmark" + (item.custom ? " custom" : "");
+        link.href = item.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        const icon = document.createElement("div");
+        icon.className = "bookmark-icon";
+        icon.textContent = item.icon || "✦";
+
+        const name = document.createElement("span");
+        name.className = "bookmark-name";
+        name.textContent = item.name;
+
+        link.append(icon, name);
+
+        if (item.custom) {
+            const remove = document.createElement("button");
+            remove.className = "remove";
+            remove.type = "button";
+            remove.textContent = "×";
+            remove.setAttribute("aria-label", "Remove " + item.name);
+
+            remove.addEventListener("click", event => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                const custom = getCustomBookmarks();
+                custom.splice(index - defaults.length, 1);
+                saveCustomBookmarks(custom);
+                renderBookmarks();
+            });
+
+            link.appendChild(remove);
+        }
+
+        container.appendChild(link);
+    });
+}
+
+// SEARCH
+
+function searchWeb(value) {
+    const query = value.trim();
+    if (!query) return;
+
+    let destination;
+
+    const looksLikeUrl =
+        /^(https?:\/\/)/i.test(query) ||
+        (/^[^\s]+\.[a-z]{2,}([/?#].*)?$/i.test(query) &&
+         !query.includes(" "));
+
+    if (looksLikeUrl) {
+        destination = /^https?:\/\//i.test(query)
+            ? query
+            : "https://" + query;
+    } else {
+        destination =
+            "https://www.google.com/search?q=" +
+            encodeURIComponent(query);
+    }
+
+    try {
+        const url = new URL(destination);
+        if (!["http:", "https:"].includes(url.protocol)) return;
+
+        window.open(url.href, "_blank", "noopener,noreferrer");
+    } catch {
+        alert("Please enter a valid website or search.");
+    }
+}
+
+document.getElementById("searchForm")
+    .addEventListener("submit", event => {
+        event.preventDefault();
+        searchWeb(document.getElementById("searchInput").value);
+    });
+
+// ADD BOOKMARK
+
+document.getElementById("addBookmark")
+    .addEventListener("click", () => {
+        document.getElementById("bookmarkName").value = "";
+        document.getElementById("bookmarkUrl").value = "";
+        dialog.showModal();
+    });
+
+document.getElementById("closeDialog")
+    .addEventListener("click", () => dialog.close());
+
+document.getElementById("bookmarkForm")
+    .addEventListener("submit", event => {
+        event.preventDefault();
+
+        const name = document.getElementById("bookmarkName")
+            .value.trim();
+
+        let url = document.getElementById("bookmarkUrl")
+            .value.trim();
+
+        if (!/^https?:\/\//i.test(url)) {
+            url = "https://" + url;
+        }
+
+        try {
+            const parsed = new URL(url);
+
+            if (!["http:", "https:"].includes(parsed.protocol)) {
+                throw new Error();
+            }
+
+            const custom = getCustomBookmarks();
+
+            custom.push({
+                name,
+                url: parsed.href,
+                icon: "✦"
+            });
+
+            saveCustomBookmarks(custom);
+            renderBookmarks();
+            dialog.close();
+
+        } catch {
+            alert("Please enter a valid website URL.");
+        }
+    });
+
+renderBookmarks();
+</script>
+
+</body>
+</html>
