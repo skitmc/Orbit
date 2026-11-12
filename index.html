@@ -105,43 +105,11 @@ header {
     font-size: 12px;
 }
 
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.account-button {
-    min-height: 38px;
-    padding: 0 15px;
-    border: 1px solid rgba(255,255,255,.2);
-    border-radius: 999px;
-    background: white;
-    color: #242424;
-    font-size: 13px;
-    font-weight: 650;
-    cursor: pointer;
-}
-
-.account-button:hover {
-    background: #eee;
-}
-
-.account-button:focus-visible,
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
     outline: 2px solid #c4b5fd;
     outline-offset: 3px;
-}
-
-.account-email {
-    max-width: 180px;
-    overflow: hidden;
-    color: var(--muted);
-    font-size: 12px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 /* MAIN */
@@ -427,20 +395,6 @@ dialog input {
     background: #29283d;
 }
 
-#googleButton {
-    display: flex;
-    justify-content: center;
-    min-height: 44px;
-    margin: 18px 0 12px;
-}
-
-.login-status {
-    min-height: 20px;
-    color: #f0c4c4;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
 @media (max-width: 380px) {
     .bookmarks {
         grid-template-columns: repeat(3, 1fr);
@@ -460,9 +414,6 @@ dialog input {
         display: none;
     }
 
-    .account-email {
-        display: none;
-    }
 }
 </style>
 </head>
@@ -477,13 +428,7 @@ dialog input {
         <div class="brand-icon">◉</div>
         ORBIT
     </div>
-    <div class="header-actions">
-        <div class="header-right">YOUR PERSONAL WEB</div>
-        <span class="account-email" id="accountEmail" hidden></span>
-        <button class="account-button" id="accountButton" type="button">
-            Continue with Google
-        </button>
-    </div>
+    <div class="header-right">YOUR PERSONAL WEB</div>
 </header>
 
 <main>
@@ -549,21 +494,6 @@ dialog input {
     </form>
 </dialog>
 
-<dialog id="loginDialog" aria-labelledby="loginTitle">
-    <h2 id="loginTitle">Sign in to Orbit</h2>
-    <p id="loginDescription">
-        Use your Google account to personalize this browser session.
-        Your bookmarks stay on this device. This page does not protect
-        private data or sync bookmarks between devices.
-    </p>
-    <div id="googleButton"></div>
-    <div class="login-status" id="loginStatus" role="status" aria-live="polite"></div>
-    <div class="dialog-buttons">
-        <button type="button" class="cancel" id="closeLoginDialog">Close</button>
-    </div>
-</dialog>
-
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 const defaults = [
     {name:"Google", icon:"🔍", url:"https://www.google.com"},
@@ -577,126 +507,9 @@ const defaults = [
 ];
 
 const STORAGE_KEY = "orbit-custom-bookmarks";
-// Set this to a Google OAuth Web client ID configured for this site's origin.
-const GOOGLE_CLIENT_ID = "";
 
 const container = document.getElementById("bookmarks");
 const dialog = document.getElementById("bookmarkDialog");
-const loginDialog = document.getElementById("loginDialog");
-const loginStatus = document.getElementById("loginStatus");
-const accountButton = document.getElementById("accountButton");
-const accountEmail = document.getElementById("accountEmail");
-let googleSignInInitialized = false;
-let signedInProfile = null;
-
-function showLoginStatus(message) {
-    loginStatus.textContent = message;
-}
-
-function decodeGoogleProfile(credential) {
-    const payloadPart = credential.split(".")[1];
-    if (!payloadPart) {
-        throw new Error("Google returned an invalid sign-in response.");
-    }
-
-    const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
-    const bytes = Uint8Array.from(atob(base64), character =>
-        character.charCodeAt(0)
-    );
-    const profile = JSON.parse(new TextDecoder().decode(bytes));
-
-    if (typeof profile.email !== "string" || !profile.email) {
-        throw new Error("Google did not provide an email address.");
-    }
-
-    return {
-        email: profile.email
-    };
-}
-
-function updateAccount(profile) {
-    signedInProfile = profile;
-    accountEmail.textContent = profile ? profile.email : "";
-    accountEmail.hidden = !profile;
-    accountButton.textContent = profile ? "Sign out" : "Continue with Google";
-    accountButton.setAttribute(
-        "aria-label",
-        profile ? "Sign out of Orbit" : "Continue with Google"
-    );
-}
-
-function handleGoogleCredential(response) {
-    try {
-        const profile = decodeGoogleProfile(response.credential);
-        updateAccount(profile);
-        loginDialog.close();
-        showLoginStatus("");
-    } catch (error) {
-        showLoginStatus(error.message);
-    }
-}
-
-function openGoogleSignIn() {
-    showLoginStatus("");
-    document.getElementById("googleButton").replaceChildren();
-
-    if (!GOOGLE_CLIENT_ID) {
-        showLoginStatus(
-            "Google sign-in is not configured. Set GOOGLE_CLIENT_ID in the page script and authorize this site's origin in Google Cloud Console."
-        );
-        loginDialog.showModal();
-        return;
-    }
-
-    if (!window.google?.accounts?.id) {
-        showLoginStatus(
-            "Google sign-in could not load. Check your connection and try again."
-        );
-        loginDialog.showModal();
-        return;
-    }
-
-    try {
-        if (!googleSignInInitialized) {
-            window.google.accounts.id.initialize({
-                client_id: GOOGLE_CLIENT_ID,
-                callback: handleGoogleCredential,
-                auto_select: false
-            });
-            googleSignInInitialized = true;
-        }
-
-        window.google.accounts.id.renderButton(
-            document.getElementById("googleButton"),
-            {
-                theme: "filled_black",
-                size: "large",
-                shape: "pill",
-                text: "continue_with",
-                width: Math.max(200, Math.min(350, window.innerWidth - 80))
-            }
-        );
-        loginDialog.showModal();
-    } catch (error) {
-        showLoginStatus(
-            "Google sign-in could not start. Check the client ID and authorized site origin."
-        );
-        loginDialog.showModal();
-    }
-}
-
-accountButton.addEventListener("click", () => {
-    if (signedInProfile) {
-        updateAccount(null);
-        window.google?.accounts?.id?.disableAutoSelect();
-        return;
-    }
-
-    openGoogleSignIn();
-});
-
-document.getElementById("closeLoginDialog")
-    .addEventListener("click", () => loginDialog.close());
 
 function getCustomBookmarks() {
     try {
