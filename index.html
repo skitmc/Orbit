@@ -497,7 +497,7 @@ dialog input {
 <script>
 const defaults = [
     {name:"Google", icon:"🔍", url:"https://www.google.com"},
-    {name:"TikTok", icon:"♪", url:"https://www.tiktok.com/"},
+    {name:"TikTok", icon:"♪", url:"https://www.tiktok.com/", sameTab:true},
     {name:"YouTube", icon:"▶", url:"https://www.youtube.com"},
     {name:"Discord", icon:"💬", url:"https://discord.com/app"},
     {name:"Reddit", icon:"👾", url:"https://www.reddit.com"},
@@ -535,7 +535,7 @@ function renderBookmarks() {
         const link = document.createElement("a");
         link.className = "bookmark" + (item.custom ? " custom" : "");
         link.href = item.url;
-        link.target = "_blank";
+        link.target = item.sameTab ? "_self" : "_blank";
         link.rel = "noopener noreferrer";
 
         const icon = document.createElement("div");
