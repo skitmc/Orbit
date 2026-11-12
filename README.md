@@ -5,7 +5,7 @@ Orbit is a personal start page with web search and device-local bookmarks.
 ## Features
 
 - Search results and bookmarks load in an embedded viewer when the destination allows framing
-- Sites that block embedding can be opened directly in the current tab
+- TikTok opens directly in the current tab so its full site can work; other sites load in the embedded viewer when allowed
 - Quick-access bookmarks for popular services
 - Custom bookmarks saved in browser localStorage for device-local persistence
 - Minimal, moonlit dashboard design optimized for new-tab browsing

@@ -588,7 +588,7 @@ dialog input {
 <script>
 const defaults = [
     {name:"Google", icon:"🔍", url:"https://www.google.com"},
-    {name:"TikTok", icon:"♪", url:"https://www.tiktok.com/", sameTab:true},
+    {name:"TikTok", icon:"♪", url:"https://www.tiktok.com/"},
     {name:"YouTube", icon:"▶", url:"https://www.youtube.com"},
     {name:"Discord", icon:"💬", url:"https://discord.com/app"},
     {name:"Reddit", icon:"👾", url:"https://www.reddit.com"},
@@ -619,6 +619,12 @@ function openEmbedded(url) {
 
     if (!["http:", "https:"].includes(destination.protocol)) {
         alert("Please enter a valid website URL.");
+        return;
+    }
+
+    if (destination.hostname === "tiktok.com" ||
+        destination.hostname.endsWith(".tiktok.com")) {
+        window.location.assign(destination.href);
         return;
     }
 
